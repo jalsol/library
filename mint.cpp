@@ -27,16 +27,16 @@ struct mint {
     mint operator++() { if (++v == mod) v = 0; return *this; }
     mint operator--() { if (v == 0) v = mod; --v; return *this; }
 
-	mint& operator+=(const mint& a) { v -= mod - a.v; v = (v < 0) ? v + mod : v; return *this; }
-	mint& operator-=(const mint& a) { v -= a.v; v = (v < 0) ? v + mod : v; return *this; }
-	mint& operator*=(const mint& a) { return *this = mint(1LL * v * a.v); } // subject to change
-	mint& operator/=(const mint& a) { return *this *= a.inv(); }
+    mint& operator+=(const mint& a) { v -= mod - a.v; v = (v < 0) ? v + mod : v; return *this; }
+    mint& operator-=(const mint& a) { v -= a.v; v = (v < 0) ? v + mod : v; return *this; }
+    mint& operator*=(const mint& a) { return *this = mint(1LL * v * a.v); } // subject to change
+    mint& operator/=(const mint& a) { return *this *= a.inv(); }
 
-	friend mint operator++(mint& a, int) { mint r = a; ++a; return r; }
-	friend mint operator--(mint& a, int) { mint r = a; --a; return r; }
-	friend mint operator+(const mint& a, const mint& b) { return mint(a) += b; }
-	friend mint operator-(const mint& a, const mint& b) { return mint(a) -= b; }
-	friend mint operator*(const mint& a, const mint& b) { return mint(a) *= b; }
-	friend mint operator/(const mint& a, const mint& b) { return mint(a) /= b; }
+    friend mint operator++(mint& a, int) { mint r = a; ++a; return r; }
+    friend mint operator--(mint& a, int) { mint r = a; --a; return r; }
+    friend mint operator+(const mint& a, const mint& b) { return mint(a) += b; }
+    friend mint operator-(const mint& a, const mint& b) { return mint(a) -= b; }
+    friend mint operator*(const mint& a, const mint& b) { return mint(a) *= b; }
+    friend mint operator/(const mint& a, const mint& b) { return mint(a) /= b; }
 };
 
