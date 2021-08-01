@@ -20,5 +20,5 @@ std::vector<int> Z(std::string s) {
         }
     }
 
-	return z;
+    return z;
 }
