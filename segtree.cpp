@@ -66,7 +66,7 @@ public:
           lazy(2 * _n + 5) {}
  
     void update(int p, T x) {
-        __update(p, x, 0, 1, n);
+        __update(p, x, 0, 0, n - 1);
     }
 
     T query(int l, int r) {
