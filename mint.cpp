@@ -1,19 +1,21 @@
 struct mint {
+private:
     int v;
     static const int mod = 1e9 + 7;
     explicit operator int() const { return v; }
 
+public:
     mint() : v(0) {}
-    mint(int64_t _v) : v(_v % mod) { v += mod * (v < 0); }
+    mint(long long _v) : v(_v % mod) { v += mod * (v < 0); }
 
     friend std::ostream& operator<<(std::ostream& os, const mint& a) { return os << int(a); }
-    friend std::istream& operator>>(std::istream& is, mint& a) { int64_t x; is >> x; a = mint(x); return is; }
+    friend std::istream& operator>>(std::istream& is, mint& a) { long long x; is >> x; a = mint(x); return is; }
 
     friend bool operator==(const mint& a, const mint& b) { return a.v == b.v; }
     friend bool operator!=(const mint& a, const mint& b) { return a.v != b.v; }
 
     static int inv_mod(int a, int m = mod) { int g = m, r = a, x = 0, y = 1; while (r != 0) { int q = g / r; g %= r; std::swap(g, r); x -= q * y; std::swap(x, y); } return x < 0 ? x + m : x; }
-    mint power(int64_t p) const { if (p < 0) return inv().power(-p); mint a = *this, ret = 1; for (; p; p >>= 1, a *= a) if (p & 1) ret *= a; return ret; }
+    mint power(long long p) const { if (p < 0) return inv().power(-p); mint a = *this, ret = 1; for (; p; p >>= 1, a *= a) if (p & 1) ret *= a; return ret; }
 
     mint inv() const { return inv_mod(v); }
     friend mint inv(const mint& a) { return a.inv(); }
