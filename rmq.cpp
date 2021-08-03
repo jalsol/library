@@ -15,5 +15,6 @@ template <class T> struct RMQ {
             st[i][j] = __op(st[i][j - 1], st[i + (1 << (j - 1))][j - 1]);
     }
 
-    T query(int l, int r) { assert(l < r); --r; int j = __internal_log2(r - l + 1); return __op(st[l][j], st[r - (1 << j) + 1][j]); }
+    T query(int l, int r) { assert(l < r); --r; int j = __internal_log2(r - l + 1);
+        return __op(st[l][j], st[r - (1 << j) + 1][j]); }
 };

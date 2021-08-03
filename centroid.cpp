@@ -9,7 +9,8 @@ template <class T> struct Centroid {
     static constexpr T inf = 1e9;
 
     Centroid() : n(0) {}
-    Centroid(int _n) : n(_n + 5) { sz.resize(_n + 5); min.resize(_n + 5); processed.resize(_n + 5); g.resize(_n + 5); }
+    Centroid(int _n) : n(_n + 5) { sz.resize(_n + 5); min.resize(_n + 5);
+        processed.resize(_n + 5); g.resize(_n + 5); }
 
     void addEdge(int u, int v, int c) { g[u].emplace_back(v, c); g[v].emplace_back(u, c); }
 

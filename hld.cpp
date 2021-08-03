@@ -5,7 +5,8 @@ template <class T, bool VALS_IN_EDGE> struct Hld {
     // LazySeg<T> tree;
 
     Hld() : n(0), timer(0) {}
-    Hld(int _n) : n(_n + 5), timer(0) { /* tree = LazySeg<T>(n + 5);*/ sz.resize(_n + 5); par.resize(_n + 5); dep.resize(_n + 5); pos.resize(_n + 5); head.resize(_n + 5); g.resize(_n + 5); }
+    Hld(int _n) : n(_n + 5), timer(0) { /* tree = LazySeg<T>(n + 5);*/ sz.resize(_n + 5); par.resize(_n + 5);
+        dep.resize(_n + 5); pos.resize(_n + 5); head.resize(_n + 5); g.resize(_n + 5); }
 
     void addedge(int u, int v) { g[u].push_back(v); g[v].push_back(u); }
 
