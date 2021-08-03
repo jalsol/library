@@ -7,22 +7,24 @@ template <class T, bool VALS_IN_EDGE> struct Hld {
     Hld() : n(0), timer(0) {}
     Hld(int _n) : n(_n + 5), timer(0) { /* tree = LazySeg<T>(n + 5);*/ sz.resize(_n + 5); par.resize(_n + 5); dep.resize(_n + 5); pos.resize(_n + 5); head.resize(_n + 5); g.resize(_n + 5); }
 
-    void addEdge(int u, int v) { g[u].push_back(v); g[v].push_back(u); }
+    void addedge(int u, int v) { g[u].push_back(v); g[v].push_back(u); }
 
-    void DfsSz(int u = 0) {
+    void __DfsSz(int u) {
         sz[u] = 1;
         for (int &v : g[u]) {
             par[v] = u; dep[v] = dep[u] + 1;
             g[v].erase(std::find(begin(g[v]), end(g[v]), u));
-            DfsSz(v); sz[u] += sz[v];
+            __DfsSz(v); sz[u] += sz[v];
             if (sz[v] > sz[g[u].front()]) std::swap(v, g[u].front());
         }
     }
 
-    void DfsHld(int u = 0) {
+    void __DfsHld(int u) {
         pos[u] = ++timer;
-        for (int &v : g[u]) head[v] = (v == g[u].front() ? head[u] : v), DfsHld(v);
+        for (int &v : g[u]) head[v] = (v == g[u].front() ? head[u] : v), __DfsHld(v);
     }
+
+    void init(int u = 0) { __DfsSz(u); __DfsHld(u); }
 
     void updateHld(int u, int v, int delta) {
         for (; head[u] != head[v]; v = par[head[v]]) {
