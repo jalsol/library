@@ -1,5 +1,4 @@
 template <class T> struct LazySeg {
-private:
     // TODO: modify these
     static constexpr int __m_Id = 0;
     T __op(T x, T y) { return x + y; }
@@ -20,8 +19,7 @@ private:
         __push(i, l, r); if (v < l || r < u) return;
         if (u <= l && r <= v) { lazy[i] += x; __push(i, l, r); return; }
         int m = __mid_range(l, r), j = __right_node(i, l, r);
-        __update(u, v, x, i + 1, l, m); __update(u, v, x, j, m + 1, r);
-        __pull(i, j);
+        __update(u, v, x, i + 1, l, m); __update(u, v, x, j, m + 1, r); __pull(i, j);
     }
  
     T __query(int u, int v, int i, int l, int r) {
@@ -31,7 +29,7 @@ private:
         return __op(__query(u, v, i + 1, l, m), __query(u, v, j, m + 1, r));
     }
  
-public:
+    LazySeg() : n(0) {}
     LazySeg(int _n) : n(_n), tree(2 * _n + 5, __m_Id), lazy(2 * _n + 5) {}
     void update(int l, int r, T x) { __update(l, r - 1, x, 0, 0, n - 1); }
     T query(int l, int r) { return __query(l, r - 1, 0, 0, n - 1); }

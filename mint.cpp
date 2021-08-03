@@ -1,10 +1,8 @@
 struct mint {
-private:
     int v;
     static const int mod = 1e9 + 7;
     explicit operator int() const { return v; }
 
-public:
     mint() : v(0) {}
     mint(long long _v) : v(_v % mod) { v += mod * (v < 0); }
 

@@ -5,7 +5,6 @@ struct Centroid {
     std::vector<long long> min;
     std::vector<bool> processed;
     std::vector<std::vector<std::pair<int, int>>> g;
-
     const long long inf = 1e18;
 
     Centroid() : n(0) {}
