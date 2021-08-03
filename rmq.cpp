@@ -5,7 +5,7 @@ template <class T> struct RMQ {
     // TODO: modify this
     T __op(T x, T y) { return std::min(x, y); }
 
-    int __internal_log2(int x) { assert(x > 0); return 31 - __builtin_popcount(x); }
+    int __internal_log2(int x) { assert(x > 0); return 31 - __builtin_clz(x); }
 
     RMQ() : n(0), lg(0) {}
     RMQ(const std::vector<T>& v) : n(v.size()), lg(__internal_log2(v.size()) + 2) {
