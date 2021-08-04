@@ -9,7 +9,7 @@ template <class T> struct Segtree {
     int __right_node(int i, int l, int r) { int m = __mid_range(l, r); return i + (m - l + 1) * 2; }
     void __pull(int i, int j) { tree[i] = __op(tree[i + 1], tree[j]); }
  
-    void __update(int p, T x, int i, int l, int r) {
+    void __update(int p, const T& x, int i, int l, int r) {
         if (p < l || r < p) return; if (l == r) tree[i] = x; return;
         int m = __mid_range(l, r), j = __right_node(i, l, r);
         if (p <= m) __update(p, x, i + 1, l, m); else __update(p, x, j, m + 1, r); __pull(i, j);
@@ -23,6 +23,6 @@ template <class T> struct Segtree {
  
     Segtree() : n(0) {}
     Segtree(int _n) : n(_n), tree(2 * _n + 5, __m_Id), lazy(2 * _n + 5) {}
-    void update(int p, T x) { __update(p, x, 0, 0, n - 1); }
+    void update(int p, const T& x) { __update(p, x, 0, 0, n - 1); }
     T query(int l, int r) { return __query(l, r - 1, 0, 0, n - 1); }
 };

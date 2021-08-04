@@ -1,7 +1,7 @@
 template <class T> struct LazySeg {
     // TODO: modify these
     static constexpr int __m_Id = 0;
-    T __op(T x, T y) { return x + y; }
+    T __op(const T& x, const T& y) { return x + y; }
     void __push(int i, int l, int r) {
         assert(l <= r); if (lazy[i] == 0) return;
         tree[i] += T(r - l + 1) * lazy[i];
