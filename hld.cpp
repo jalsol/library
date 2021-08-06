@@ -1,4 +1,5 @@
 template <class T, bool VALS_IN_EDGE> struct Hld {
+    // TODO: modify commented lines
     std::vector<int> sz, par, dep, pos, head;
     std::vector<std::vector<int>> g;
     int n, timer;
