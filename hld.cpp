@@ -1,8 +1,8 @@
 template <class T, bool VALS_IN_EDGE> struct Hld {
     // TODO: modify commented lines
+    int n, timer;
     std::vector<int> sz, par, dep, pos, head;
     std::vector<std::vector<int>> g;
-    int n, timer;
     // LazySeg<T> tree;
 
     Hld() : n(0), timer(0) {}

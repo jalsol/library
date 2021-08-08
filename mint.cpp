@@ -39,4 +39,4 @@ template <int __Mod> struct Modint {
     friend Modint operator/(const Modint& a, const Modint& b) { return Modint(a) /= b; }
 };
 
-using mint = Modint<1000000007>;
+using mint = Modint<1000000000 + 7>;

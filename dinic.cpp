@@ -1,15 +1,15 @@
 template <class T> struct Dinic {
     struct Edge { int v; T cap, flow; };
+    int n;
     std::vector<std::vector<int>> g;
     std::vector<int> ptr, level;
     std::vector<Edge> edge;
-    int n;
 
     // TODO: modify this
     static constexpr T __inf = 1e9;
 
     Dinic() : n(0) {}
-    Dinic(int _n) : n(_n), g(n, std::vector<int>()), ptr(n), level(n) {}
+    Dinic(int _n) : n(_n), g(_n, std::vector<int>()), ptr(_n), level(_n) {}
 
     void addEdge(int u, int v, T c) {
         int k = static_cast<int>(edge.size());

@@ -1,6 +1,6 @@
 template <class T> struct RMQ {
-    std::vector<std::vector<T>> st;
     int n, lg;
+    std::vector<std::vector<T>> st;
 
     // TODO: modify this
     T __op(T x, T y) { return std::min(x, y); }
