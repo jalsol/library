@@ -1,71 +1,69 @@
-template <class T> struct Dinic {
-    struct Edge { int v; T cap, flow; };
-    int n;
-    std::vector<std::vector<int>> g;
-    std::vector<int> ptr, level;
-    std::vector<Edge> edge;
+#include <vector>
+#include <climits>
 
-    // TODO: modify this
-    static constexpr T __inf = 1e9;
+struct Dinic {
+    struct Edge {
+        int to, rev;
+        long long cap, oc;
+        long long flow() { return std::max(oc - cap, 0LL); }
+    };
 
-    Dinic() : n(0) {}
-    Dinic(int _n) : n(_n), g(_n, std::vector<int>()), ptr(_n), level(_n) {}
+    std::vector<int> level, ptr, q;
+    std::vector<std::vector<Edge>> g;
 
-    void addEdge(int u, int v, T c) {
-        int k = static_cast<int>(edge.size());
-        edge.push_back({v, c, 0}); edge.push_back({u, c, c});
-        g[u].push_back(k); g[v].push_back(k ^ 1);
+    Dinic(int n) : level(n), ptr(n), q(n), g(n) {}
+
+    void addEdge(int a, int b, long long cap, long long rcap = 0) {
+        g[a].push_back({ b, int(g[b].size()),     cap,  cap  });
+        g[b].push_back({ a, int(g[a].size()) - 1, rcap, rcap });
     }
 
-    bool __Bfs(int s, int t) {
-        std::queue<int> q; q.push(s);
-        std::fill(level.begin(), level.end(), -1); level[s] = 0;
+    long long dfs(int v, int t, long long f) {
+        if (v == t || !f) return f;
 
-        while (!q.empty()) {
-            int u = q.front(); q.pop();
-            for (int i : g[u]) {
-                const Edge& e = edge[i];
-                if (level[e.v] == -1 && e.flow < e.cap) {
-                    level[e.v] = level[u] + 1;
-                    q.push(e.v);
-                }
-            }
-        }
+        for (int &i = ptr[v]; i < int(g[v].size()); ++i) {
+            Edge &e = g[v][i];
+            if (level[e.to] != level[v] + 1) continue;
 
-        return level[t] != -1;
-    }
-
-    T __Dfs(int u, int t, T amount) {
-        if (u == t) return amount;
-
-        for (int& i = ptr[u]; i < static_cast<int>(g[u].size()); i++) {
-            const Edge& e = edge[g[u][i]];
-            if (level[e.v] != level[u] + 1) continue;
-
-            if (e.flow < e.cap) {
-                T a = __Dfs(e.v, t, std::min(amount, e.cap - e.flow));
-                if (a > 0) {
-                    edge[g[u][i]].flow += a;
-                    edge[g[u][i] ^ 1].flow -= a;
-                    return a;
-                }
+            if (long long p = dfs(e.to, t, std::min(f, e.cap))) {
+                e.cap -= p;
+                g[e.to][e.rev].cap += p;
+                return p;
             }
         }
 
         return 0;
     }
 
-    T flow(int s, int t, T mx = __inf) {
-        T ret = 0;
-        while (__Bfs(s, t)) {
-            std::fill(ptr.begin(), ptr.end(), 0);
-            for (;;) {
-                T augment = __Dfs(s, t, mx - ret);
-                if (augment == 0) break;
-                ret += augment;
-            }
+    long long calc(int s, int t) {
+        long long flow = 0; q[0] = s;
+
+        for (int L = 0; L < 31; ++L) {
+            do {
+                level = ptr = std::vector<int>(q.size());
+                int qi = 0, qe = level[s] = 1;
+
+                while (qi < qe && !level[t]) {
+                    int v = q[qi++];
+                    for (const Edge &e : g[v]) {
+                        if (!level[e.to] && e.cap >> (30 - L)) {
+                            q[qe++] = e.to;
+                            level[e.to] = level[v] + 1;
+                        }
+                    }
+                }
+
+                while (long long p = dfs(s, t, LLONG_MAX)) {
+                    flow += p;
+                }
+
+            } while (level[t]);
         }
 
-        return ret;
+        return flow;
+    }
+
+    bool leftOfMinCut(int a) {
+        return level[a] != 0;
     }
 };

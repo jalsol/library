@@ -1,20 +1,23 @@
-template <class T> struct RMQ {
-    int n, lg;
-    std::vector<std::vector<T>> st;
+#include <vector>
+#include <cassert>
 
-    // TODO: modify this
-    T __op(T x, T y) { return std::min(x, y); }
+template<class T>
+struct RMQ {
+    std::vector<std::vector<T>> jmp;
 
-    int __internal_log2(int x) { assert(x > 0); return 31 - __builtin_clz(x); }
+    RMQ(const std::vector<T>& v) : jmp(1, v) {
+        for (int pw = 1, k = 1; pw * 2 <= int(v.size()); pw *= 2, ++k) {
+            jmp.emplace_back(int(v.size()) - pw * 2 + 1);
 
-    RMQ() : n(0), lg(0) {}
-    RMQ(const std::vector<T>& v) : n(v.size()), lg(__internal_log2(v.size()) + 2) {
-        st.assign(n, std::vector<T>(lg));
-        for (int i = 0; i < n; i++) st[i][0] = v[i];
-        for (int j = 1; j < lg; j++) for (int i = 0; i + (1 << j) <= n; i++)
-            st[i][j] = __op(st[i][j - 1], st[i + (1 << (j - 1))][j - 1]);
+            for (int j = 0; j < jmp[k].size(); ++j) {
+                jmp[k][j] = min(jmp[k - 1][j], jmp[k - 1][j + pw]);
+            }
+        }
     }
 
-    T query(int l, int r) { assert(l < r); --r; int j = __internal_log2(r - l + 1);
-        return __op(st[l][j], st[r - (1 << j) + 1][j]); }
+    T query(int a, int b) {
+        assert(a < b);
+        int dep = 31 - __builtin_clz(b - a);
+        return min(jmp[dep][a], jmp[dep][b - (1 << dep)]);
+    }
 };

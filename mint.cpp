@@ -1,3 +1,5 @@
+#include <iostream>
+
 template <int __Mod> struct Modint {
     int v;
     explicit operator int() const { return v; }
