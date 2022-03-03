@@ -1,68 +1,103 @@
 #include <vector>
+#include <algorithm>
 
-template <class T> struct Centroid {
-    int n, k, maxdepth; T ans;
-    std::vector<int> sz;
-    std::vector<T> min;
-    std::vector<bool> rem;
-    std::vector<std::vector<std::pair<int, int>>> g;
+using namespace std;
 
-    // TODO: modify this
-    static constexpr T inf = 1e9;
+using ll = long long;
 
-    Centroid() : n(0) {}
-    Centroid(int _n)
-        : n(_n + 5), sz(_n + 5), min(_n + 5), rem(_n + 5), g(_n + 5) {}
+constexpr int maxN = 1e5 + 5;
 
-    void addEdge(int u, int v, int c) {
-        g[u].emplace_back(v, c);
-        g[v].emplace_back(u, c);
+vector<int> g[maxN];
+
+int sz[maxN];
+bool rem[maxN];
+int par[maxN];
+
+int getSize(int u, int p) {
+    sz[u] = 1;
+    for (int v : g[u]) if (!rem[v] && v != p) {
+        sz[u] += getSize(v, u);
+    }
+    return sz[u];
+}
+
+int getCen(int u, int p, int limit) {
+    for (int v : g[u]) if (!rem[v] && v != p) {
+        if (sz[v] * 2 > limit) {
+            return getCen(v, u, limit);
+        }
+    }
+    return u;
+}
+
+// =============================================================================
+
+void buildCen(int u, int p) {
+    u = getCen(u, p, getSize(u, p));
+    rem[u] = true;
+    par[u] = p;
+
+    for (int v : g[u]) if (!rem[v]) {
+        buildCen(v, u);
+    }
+}
+
+void update(int x) {
+    for (int u = x; u != -1; u = par[u]) {
+
+    }
+}
+
+int get(int x) {
+    int ret = 0;
+
+    for (int u = x; u != -1; u = par[u]) {
+
     }
 
-    int __getSz(int u, int p = 0) {
-        sz[u] = 1;
-        for (const auto& [v, c] : g[u])
-            if (!rem[v] && v != p)
-                sz[u] += __getSz(v, u);
-        return sz[u];
+    return ret;
+}
+
+// =============================================================================
+
+int d;
+int cnt[maxN];
+bool important[maxN];
+
+int maxDist;
+ll ans;
+
+void solvePath(int u, int p, int cen, bool fill) {
+    int dist /* = getDist(u, cen); */;
+    if (dist > d) return;
+    maxDist = max(maxDist, dist);
+
+    if (important[u]) {
+        if (fill) {
+            ++cnt[dist];
+        } else {
+            ans += cnt[d - dist];
+        }
     }
 
-    int __getCen(int u, int tsz, int p = 0) {
-        for (const auto& [v, c] : g[u])
-            if (!rem[v] && v != p && sz[v] * 2 > tsz)
-                return __getCen(v, tsz, u);
-        return u;
+    for (int v : g[u]) if (!rem[v] && v != p) {
+        solvePath(v, u, cen, fill);
+    }
+}
+
+void solveCen(int u) {
+    u = getCen(u, -1, getSize(u, -1));
+    rem[u] = true;
+    cnt[0] = important[u];
+
+    for (int v : g[u]) if (!rem[v]) {
+        solvePath(v, u, u, false);
+        solvePath(v, u, u, true);
     }
 
-    void __getAns(int u, int p, T sum, bool mark, int depth = 1) {
-        if (depth > k) return; maxdepth = std::max(maxdepth, depth);
+    fill_n(cnt, maxDist + 1, 0);
 
-        if (mark) min[depth] = std::min(min[depth], sum);
-        else ans = std::min(ans, sum + min[k - depth]);
-
-        for (const auto& [v, c] : g[u])
-            if (!rem[v] && v != p)
-                __getAns(v, u, sum + c, mark, depth + 1);
+    for (int v : g[u]) if (!rem[v]) {
+        solveCen(v);
     }
-
-    void __solveCen(int u) {
-        u = __getCen(u, __getSz(u)); rem[u] = true; min[0] = 0; maxdepth = 0;
-
-        for (const auto& [v, c] : g[u])
-            if (!rem[v])
-                __getAns(v, u, c, false), __getAns(v, u, c, true);
-
-        std::fill_n(begin(min) + 1, maxdepth, inf);
-        for (const auto& [v, c] : g[u])
-            if (!rem[v]) __solveCen(v);
-    }
-
-    T solve(int _k) {
-        ans = inf; k = _k; maxdepth = 0;
-        std::fill(sz.begin(), sz.end(), 0);
-        std::fill(min.begin(), min.end(), inf);
-        std::fill(rem.begin(), rem.end(), false);
-        __solveCen(0);
-        return ans;
-    }
-};
+}

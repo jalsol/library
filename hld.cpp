@@ -1,73 +1,60 @@
-#include "impliseg.cpp"
-
-#include <vector>
 #include <algorithm>
 
-template <bool VALS_EDGES> struct HLD {
-    int N, timer = 0;
-    std::vector<std::vector<int>> g;
-    std::vector<int> par, sz, dep, root, pos;
+using namespace std;
 
-    Node* tree;
+using ll = long long;
 
-    HLD(const std::vector<std::vector<int>>& _g)
-        : N(_g.size()), g(_g), par(N, -1), sz(N, 1), dep(N),
-          root(N), pos(N), tree(new Node(0, N))
-    {
-        DfsSz(0); DfsHld(0);
-    }
+constexpr int maxN = 1e5 + 5;
 
-    void DfsSz(int v) {
-        if (par[v] != -1) {
-            g[v].erase(std::find(g[v].begin(), g[v].end(), par[v]));
-        }
+vector<int> g[maxN];
 
-        for (int &u : g[v]) {
-            par[u] = v;
-            dep[u] = dep[v] + 1;
+int sz[maxN];
+int par[maxN];
+int heavy[maxN];
+int dep[maxN];
 
-            DfsSz(u);
+int Dfs(int u) {
+    sz[u] = 1;
 
-            sz[v] += sz[u];
-            if (sz[u] > sz[g[v].front()]) {
-                std::swap(u, g[v].front());
-            }
+    for (int v : g[u]) if (v != par[u]) {
+        par[v] = u;
+        dep[v] = dep[u] + 1;
+        sz[u] += Dfs(v);
+
+        if (sz[heavy[u]] < sz[v]) {
+            heavy[u] = v;
         }
     }
 
-    void DfsHld(int v) {
-        pos[v] = timer++;
-        for (int u : g[v]) {
-            root[u] = (u == g[v].front() ? root[v] : u);
-            DfsHld(u);
-        }
+    return sz[u];
+}
+
+int head[maxN];
+int tin[maxN], timer;
+
+void decompose(int u, int lead) {
+    head[u] = lead;
+    tin[u] = ++timer;
+
+    if (heavy[u]) {
+        decompose(heavy[u], lead);
     }
 
-    template <class B> void process(int u, int v, B op) {
-        for (; root[u] != root[v]; v = par[root[v]]) {
-            if (dep[root[u]] > dep[root[v]]) std::swap(u, v);
-            op(pos[root[v]], pos[v] + 1);
-        }
+    for (int v : g[u]) if (v != par[u] && v != heavy[u]) {
+        decompose(v, v);
+    }
+}
 
-        if (dep[u] > dep[v]) std::swap(u, v);
-        op(pos[u] + VALS_EDGES, pos[v] + 1);
+int query(int u, int v) {
+    ll ret = 0;
+
+    for (; head[u] != head[v]; v = par[head[v]]) {
+        if (dep[head[u]] > dep[head[v]]) swap(u, v);
+        // ret += get(tin[head[v]], tin[v])
     }
 
-    void modifyPath(int u, int v, int val) {
-        process(u, v, [&](int l, int r) {
-            tree->add(l, r, val);
-        });
-    }
+    if (dep[u] > dep[v]) swap(u, v);
+    // ret += get(tin[u], tin[v]);
 
-    int queryPath(int u, int v) {
-        int ret = -1e9;
-        process(u, v, [&](int l, int r) {
-            ret = std::max(ret, tree->query(l, r));
-        });
-        return ret;
-    }
-
-    int querySubtree(int v) {
-        return tree->query(pos[v] + VALS_EDGES, pos[v] + sz[v]);
-    }
-};
+    return ret;
+}

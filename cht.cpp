@@ -1,67 +1,61 @@
-#include <functional>
 #include <set>
+#include <climits>
 
-constexpr long long CHTQuery = -(1LL << 62);
+using namespace std;
+
+using ll = long long;
+
+bool Q;
 
 struct Line {
-    long long a, b;
-    mutable std::function<const Line*()> getNxt;
-
-    Line(long long _a, long long _b) : a(_a), b(_b) {}
-
+    mutable ll k, m, p;
     bool operator<(const Line& o) const {
-        if (o.b != CHTQuery) return a < o.a;
-
-        const Line* nxt = getNxt();
-        if (nxt == nullptr) return false;
-
-        return b - nxt->b < (nxt->a - a) * o.a;
+        return Q ? p < o.p : k < o.k;
     }
 };
 
-struct CHT : public std::multiset<Line> {
-    bool bad(iterator it) {
-        if (size() == 1) return false;
+struct Hull : multiset<Line> {
+    static constexpr ll inf = LLONG_MAX;
 
-        auto right = next(it);
-        if (it == begin()) {
-            return (it->a == right->a) && (it->b <= right->b);
-        }
-
-        auto left = prev(it);
-        if (right == end()) {
-            return (it->a == left->a) && (it->b <= left->b);
-        }
-
-        return (left->b - it->b) * (right->a - it->a) >= (it->b - right->b) * (it->a - left->a);
+    ll div(ll a, ll b) {
+        return a / b - ((a ^ b) < 0 && a % b);
     }
 
-    void add(long long a, long long b) {
-        auto it = insert({ a, b });
-
-        if (bad(it)) {
-            erase(it);
-            return;
+    bool isect(iterator x, iterator y) {
+        if (y == end()) {
+            x->p = inf;
+            return false;
         }
 
-        while (next(it) != end() && bad(next(it))) {
-            erase(next(it));
+        if (x->k == y->k) {
+            x->p = (x->m > y->m) ? inf : -inf;
+        } else {
+            x->p = div(y->m - x->m, x->k - y->k);
         }
 
-        it->getNxt = [=] { return next(it) == end() ? nullptr : &*next(it); };
+        return x->p >= y->p;
+    }
 
-        while (it != begin() && bad(prev(it))) {
-            erase(prev(it));
+    void add(ll k, ll m) {
+        auto z = insert({k, m, 0});
+        auto y = z++;
+        auto x = y;
+
+        while (isect(y, z)) z = erase(z);
+
+        if (x != begin() && isect(--x, y)) {
+            isect(x, y = erase(y));
         }
 
-        if (it != begin()) {
-            prev(it)->getNxt = [=] { return &*it; };
+        while ((y = x) != begin() && (--x)->p >= y->p) {
+            isect(x, erase(y));
         }
     }
 
-    long long query(long long x) {
-        auto l = *lower_bound(Line(x, CHTQuery));
-        return l.a * x + l.b;
+    ll query(ll x) {
+        Q = true;
+        auto it = lower_bound({0, 0, x});
+        Q = false;
+        return it->k * x + it->m;
     }
 };
-
